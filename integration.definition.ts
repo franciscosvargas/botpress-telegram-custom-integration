@@ -44,7 +44,7 @@ export default new IntegrationDefinition({
   },
   user: {
     tags: {
-      id: {}, // Add this line to tag users
+      id: {},
     },
   },
 

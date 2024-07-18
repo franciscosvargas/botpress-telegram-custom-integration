@@ -1,6 +1,8 @@
 import * as sdk from "@botpress/sdk";
 import * as bp from ".botpress";
 import { Telegraf } from "telegraf";
+import { CallbackQueryHandler } from "./handlers/CallbackQuery";
+import DefaultHandler from "./handlers/default";
 
 export default new bp.Integration({
   register: async ({ webhookUrl, ctx }) => {
@@ -55,7 +57,7 @@ export default new bp.Integration({
                   inline_keyboard: payload.options.map((option: any) => [
                     {
                       text: option.label,
-                      callback_data: option.value
+                      callback_data: option.value,
                     },
                   ]),
                 },
@@ -70,52 +72,14 @@ export default new bp.Integration({
     },
   },
   handler: async ({ req, client, ctx }) => {
-    const telegram = new Telegraf(ctx.configuration.botToken);
-    const data = JSON.parse(req.body || "{}");
-
-    const conversationId = data?.callback_query?.message?.chat?.id || data?.message?.chat?.id;
-    const userId = data?.callback_query?.message?.from?.id || data?.message?.from?.id;
-    const messageId = data?.callback_query?.message?.message_id ||data?.message?.message_id;
-
-    console.log("Data =>", data);
-
-    if (!conversationId || !userId || !messageId) {
-      return {
-        status: 400,
-        body: "Handler didn't receive a valid message",
-      };
-    }
-
     try {
-      const { conversation } = await client.getOrCreateConversation({
-        channel: "group",
-        tags: { id: `${conversationId}` },
-      });
+      const data = JSON.parse(req.body || "{}");
 
-      const { user } = await client.getOrCreateUser({
-        tags: { id: `${userId}` },
-      });
-
-      if(data.callback_query) {
-
-        await client.createMessage({
-          tags: { id: `${messageId}` },
-          type: "text",
-          userId: user.id,
-          conversationId: conversation.id,
-          payload: { text: data.callback_query.data, }, 
-        })
-
-        await telegram.telegram.answerCbQuery(data.callback_query.id);
+      if (data?.callback_query) {
+        await CallbackQueryHandler({ req, client, ctx });
+      } else {
+        await DefaultHandler({ req, client, ctx });
       }
-
-      await client.createMessage({
-        tags: { id: `${messageId}` },
-        type: "text",
-        userId: user.id,
-        conversationId: conversation.id,
-        payload: { text: data.message.text },
-      });
 
       return {
         status: 200,
