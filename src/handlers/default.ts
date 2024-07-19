@@ -17,7 +17,13 @@ const DefaultHandler: IntegrationImplementationProps['handler'] = async (props) 
   checkHandlerInfo({ conversationId, userId, messageId });
 
   const conversation = await createConversation(client, conversationId);
-  const user = await createUser(client, userId);
+  
+  const user = await createUser(client, {
+    id: `${userId}`,
+    first_name: data?.message?.from?.first_name,
+    last_name: data?.message?.from?.last_name,
+    username: data?.message?.from?.username,
+  }, ctx);
 
   await client.createMessage({
     tags: { id: `${messageId}` },

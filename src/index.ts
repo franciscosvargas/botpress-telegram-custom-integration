@@ -4,6 +4,8 @@ import { Telegraf } from "telegraf";
 import { CallbackQueryHandler } from "./handlers/CallbackQuery";
 import DefaultHandler from "./handlers/default";
 
+import getUserInfo from "./actions/getUserInfo";
+
 export default new bp.Integration({
   register: async ({ webhookUrl, ctx }) => {
     const telegraf = new Telegraf(ctx.configuration.botToken);
@@ -30,6 +32,7 @@ export default new bp.Integration({
       name = name || "World";
       return { message: `Hello "${name}"! Nice to meet you ;)` };
     },
+    getUserInfo,
   },
   channels: {
     group: {

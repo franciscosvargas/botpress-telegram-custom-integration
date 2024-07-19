@@ -1,15 +1,15 @@
-import { z, IntegrationDefinition, messages } from '@botpress/sdk'
-import { integrationName } from './package.json'
+import { z, IntegrationDefinition, messages } from "@botpress/sdk";
+import { integrationName } from "./package.json";
 
 export default new IntegrationDefinition({
   name: integrationName,
-  version: '0.0.2',
-  readme: 'hub.md',
-  icon: 'icon.svg',
+  version: "0.0.2",
+  readme: "hub.md",
+  icon: "icon.svg",
   actions: {
     helloWorld: {
-      title: 'Hello World',
-      description: 'A simple hello world action',
+      title: "Hello World",
+      description: "A simple hello world action",
       input: {
         schema: z.object({
           name: z.string().optional(),
@@ -21,18 +21,18 @@ export default new IntegrationDefinition({
         }),
       },
     },
-    sendTelegramChoiceMessage: {
-      title: 'Send Telegram Choice Message',
-      description: 'Send options to the user and process the response',
+    getUserInfo: {
+      title: "Get User Info",
+      description: "Get user info from the bot",
       input: {
-        schema: z.object({
-          text: z.string().optional(),
-          options: z.array(z.string()).optional(),
-        }),
+        schema: z.object({}),
       },
       output: {
         schema: z.object({
-          message: z.string(),
+          id: z.number(),
+          first_name: z.string().optional(),
+          last_name: z.string().optional(),
+          username: z.string().optional(),
         }),
       },
     },
@@ -40,14 +40,13 @@ export default new IntegrationDefinition({
   configuration: {
     schema: z.object({
       botToken: z.string(),
-    })
+    }),
   },
   user: {
     tags: {
       id: {},
     },
   },
-
   channels: {
     group: {
       // messages: messages.defaults,  // use this to support all message types supported in Botpress Studio
@@ -62,8 +61,6 @@ export default new IntegrationDefinition({
           id: {}, // Add this line to tag conversations
         },
       },
-      
     },
-  }
-  
-})
+  },
+});

@@ -18,7 +18,12 @@ export const CallbackQueryHandler: IntegrationImplementationProps['handler'] = a
   checkHandlerInfo({ conversationId, userId, messageId });
 
   const conversation = await createConversation(client, conversationId);
-  const user = await createUser(client, userId);
+  const user = await createUser(client, {
+    id: `${userId}`,
+    first_name: data?.callback_query?.message?.from?.first_name,
+    last_name: data?.callback_query?.message?.from?.last_name,
+    username: data?.callback_query?.message?.from?.username,
+  }, ctx);
 
   await telegram.telegram.editMessageReplyMarkup(
     conversationId,
