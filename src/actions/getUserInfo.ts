@@ -15,6 +15,8 @@ export default async function getUserInfo({ ctx }: GetUserInfoProps) {
 
     const { user } = await client.getUser({ id: ctx.botUserId });
 
+    console.log("Get User =>", user);
+
     if (!user) {
       throw new Error("User not found");
     }
@@ -24,9 +26,12 @@ export default async function getUserInfo({ ctx }: GetUserInfoProps) {
     const userSearch = await client.findTableRows({
       table: "Users_Table",
       filter: {
-        channelId,
+        channelId: { $eq: channelId },
       },
     });
+
+    console.log('Channel ID =>', channelId);
+    console.log("User Search =>", userSearch);
 
     if (userSearch.rows.length > 0) {
       return userSearch.rows[0];

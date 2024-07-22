@@ -8,6 +8,7 @@ interface User {
   first_name?: string;
   last_name?: string;
   username?: string;
+  language?: string;
 }
 
 export async function createConversation(client: IntegrationSpecificClient<BaseIntegration>, conversationId: string, channel: string = "group") {
@@ -27,6 +28,15 @@ export async function createUser(client: IntegrationSpecificClient<BaseIntegrati
     },
   });
 
+  if(!user.tags.id) {
+    await client.updateUser({
+      id: user.id,
+      tags: {
+        id: `${User.id}`,
+      }
+    })
+  }
+
   const botpressClient = new Client({
     botId: ctx.botId,
     integrationId: ctx.integrationId,
@@ -35,7 +45,7 @@ export async function createUser(client: IntegrationSpecificClient<BaseIntegrati
   const userSearch = await botpressClient.findTableRows({
     table: 'Users_Table',
     filter: {
-      channelId: User.id
+      channelId: User.id,
     }
   })
 
@@ -49,8 +59,12 @@ export async function createUser(client: IntegrationSpecificClient<BaseIntegrati
     table: 'Users_Table',
     rows: [
      {
-      ...User,
-      channelId: User.id
+      channelId: User.id,
+      botpress_id: user.id,
+      language: User.language === 'pt-br' ? 'pt-BR' : 'en-US',
+      last_name: User.last_name || '',
+      first_name: User.first_name || '',
+      username: User.username || '',
      }
     ]
   })

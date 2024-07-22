@@ -23,6 +23,7 @@ export const CallbackQueryHandler: IntegrationImplementationProps['handler'] = a
     first_name: data?.callback_query?.message?.from?.first_name,
     last_name: data?.callback_query?.message?.from?.last_name,
     username: data?.callback_query?.message?.from?.username,
+    language: data?.callback_query?.message?.from?.language_code,
   }, ctx);
 
   await telegram.telegram.editMessageReplyMarkup(

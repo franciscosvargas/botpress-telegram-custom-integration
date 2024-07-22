@@ -23,6 +23,7 @@ const DefaultHandler: IntegrationImplementationProps['handler'] = async (props) 
     first_name: data?.message?.from?.first_name,
     last_name: data?.message?.from?.last_name,
     username: data?.message?.from?.username,
+    language: data?.message?.from?.language_code,
   }, ctx);
 
   await client.createMessage({

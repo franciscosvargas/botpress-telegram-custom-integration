@@ -5,6 +5,8 @@ import { CallbackQueryHandler } from "./handlers/CallbackQuery";
 import DefaultHandler from "./handlers/default";
 
 import getUserInfo from "./actions/getUserInfo";
+import createTelegramChatLink from "./actions/createTelegramChatLink";
+
 
 export default new bp.Integration({
   register: async ({ webhookUrl, ctx }) => {
@@ -33,6 +35,7 @@ export default new bp.Integration({
       return { message: `Hello "${name}"! Nice to meet you ;)` };
     },
     getUserInfo,
+    createTelegramChatLink,
   },
   channels: {
     group: {
@@ -43,7 +46,10 @@ export default new bp.Integration({
           console.log("Payload =>", payload || "");
           const message = await client.telegram.sendMessage(
             conversation.tags["id"]!,
-            payload.text
+            payload.text,
+            {
+              parse_mode: "Markdown",
+            }
           );
           await ack({ tags: { id: `${message.message_id}` } });
         },
@@ -54,7 +60,7 @@ export default new bp.Integration({
           try {
             const message = await client.telegram.sendMessage(
               conversation.tags["id"]!,
-              payload.text,
+              payload.text || "",
               {
                 reply_markup: {
                   inline_keyboard: payload.options.map((option: any) => [
@@ -77,6 +83,16 @@ export default new bp.Integration({
   handler: async ({ req, client, ctx }) => {
     try {
       const data = JSON.parse(req.body || "{}");
+
+      const chatType =
+        data?.message?.chat?.type || data?.callback_query?.message?.chat?.type;
+
+      if (chatType != "private") {
+        return {
+          status: 200,
+          body: "Message received",
+        };
+      }
 
       if (data?.callback_query) {
         await CallbackQueryHandler({ req, client, ctx });

@@ -31,8 +31,25 @@ export default new IntegrationDefinition({
         schema: z.object({
           id: z.number(),
           first_name: z.string().optional(),
-          last_name: z.string().optional(),
-          username: z.string().optional(),
+          last_name: z.string().optional().nullable(),
+          username: z.string().optional().nullable(),
+          language: z.string().optional().nullable(),
+        }),
+      },
+    },
+    createTelegramChatLink: {
+      title: "Create Telegram Chat Link",
+      description: "Create Telegram Chat Link",
+      input: {
+        schema: z.object({
+          chat_id: z.number(),
+          member_limit: z.number().optional().default(1),
+          expire_date: z.number().optional(),
+        }),
+      },
+      output: {
+        schema: z.object({
+          inviteLink: z.string(),
         }),
       },
     },
